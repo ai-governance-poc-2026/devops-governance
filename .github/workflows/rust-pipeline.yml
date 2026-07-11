@@ -1,0 +1,15 @@
+name: Rust Quality Sub-Context
+on:
+  workflow_call:
+jobs:
+  validate-rust:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Initialize Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: clippy, rustfmt
+      - name: Enforce Code Review Controls
+        run: cargo clippy -- -D warnings

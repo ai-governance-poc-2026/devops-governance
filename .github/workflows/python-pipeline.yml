@@ -1,0 +1,17 @@
+name: Python Quality Sub-Context
+on:
+  workflow_call:
+jobs:
+  validate-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Initialize Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Execute Quality Verification
+        run: |
+          pip install ruff
+          ruff check . --target-version py312

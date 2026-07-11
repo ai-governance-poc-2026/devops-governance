@@ -1,0 +1,31 @@
+name: AI Agent & Graph Quality Sub-Context
+on:
+  workflow_call:
+jobs:
+  validate-ai-structures:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Verify LangGraph Recursion Safeguards
+        run: |
+          VIOLATIONS=0
+          while IFS= read -r file; do
+            if grep -E "\.(invoke|stream|ainvoke|astream)\(" "$file" && ! grep -q "recursion_limit" "$file"; then
+              echo "❌ CRITICAL FAULT: LangGraph invocation found without an explicit 'recursion_limit' buffer config in: $file"
+              VIOLATIONS=$((VIOLATIONS + 1))
+            fi
+          done < <(find . -type f \( -name "*.py" -o -name "*.js" -o -name "*.ts" \))
+          if [ $VIOLATIONS -gt 0 ]; then exit 1; fi
+      - name: Inspect Prompt Template Structural Security
+        run: |
+          if grep -E "SystemMessagePromptTemplate\.from_template\(f['\"]" -r . --exclude-dir=node_modules; then
+             echo "❌ SECURITY WARNING: Unsafe dynamic f-string formatting inside PromptTemplate configuration."
+             exit 1
+          fi
+      - name: Validate Binary Vector Database Footprints
+        run: |
+          if find . -type f \( -name "*.index" -o -name "*.pkl" -o -name "chroma.sqlite3" \) | grep -q .; then
+             echo "❌ ARTIFACT FAULT: Local Vector database binaries detected inside code repository tree."
+             exit 1
+          fi

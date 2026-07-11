@@ -1,0 +1,15 @@
+name: Go Quality Sub-Context
+on:
+  workflow_call:
+jobs:
+  validate-go:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Initialize Go Environment
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - name: Enforce Go Verifications
+        run: go vet ./...

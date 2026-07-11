@@ -1,0 +1,67 @@
+name: Universal Polyglot AI Guardrails Orchestrator
+
+on:
+  pull_request:
+
+jobs:
+  environment-discovery:
+    name: Detect Project Stack
+    runs-on: ubuntu-latest
+    outputs:
+      is_node: ${{ steps.check.outputs.is_node }}
+      is_python: ${{ steps.check.outputs.is_python }}
+      is_java: ${{ steps.check.outputs.is_java }}
+      is_rust: ${{ steps.check.outputs.is_rust }}
+      is_go: ${{ steps.check.outputs.is_go }}
+      is_ai_agent: ${{ steps.check.outputs.is_ai_agent }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Inspect Repository Signature
+        id: check
+        run: |
+          if [ -f package.json ]; then echo "is_node=true" >> $GITHUB_OUTPUT; fi
+          if [ -f requirements.txt ] || [ -f pyproject.toml ] || ls *.py &>/dev/null; then echo "is_python=true" >> $GITHUB_OUTPUT; fi
+          if [ -f Cargo.toml ] || ls **/*.rs &>/dev/null || ls *.rs &>/dev/null; then echo "is_rust=true" >> $GITHUB_OUTPUT; fi
+          if [ -f go.mod ] || ls **/*.go &>/dev/null || ls *.go &>/dev/null; then echo "is_go=true" >> $GITHUB_OUTPUT; fi
+          if [ -f pom.xml ] || [ -f build.gradle ] || [ -f build.gradle.kts ] || ls **/*.java &>/dev/null || ls *.java &>/dev/null; then echo "is_java=true" >> $GITHUB_OUTPUT; fi
+          
+          if grep -E -q -i "(langchain|langgraph)" requirements.txt package.json pyproject.toml package-lock.json 2>/dev/null; then 
+            echo "is_ai_agent=true" >> $GITHUB_OUTPUT
+          fi
+
+  node-pipeline:
+    needs: environment-discovery
+    if: needs.environment-discovery.outputs.is_node == 'true'
+    uses: ai-governance-poc-2026/devops-governance/.github/workflows/node-pipeline.yml@main
+
+  python-pipeline:
+    needs: environment-discovery
+    if: needs.environment-discovery.outputs.is_python == 'true'
+    uses: ai-governance-poc-2026/devops-governance/.github/workflows/python-pipeline.yml@main
+
+  java-pipeline:
+    needs: environment-discovery
+    if: needs.environment-discovery.outputs.is_java == 'true'
+    uses: ai-governance-poc-2026/devops-governance/.github/workflows/java-pipeline.yml@main
+
+  rust-pipeline:
+    needs: environment-discovery
+    if: needs.environment-discovery.outputs.is_rust == 'true'
+    uses: ai-governance-poc-2026/devops-governance/.github/workflows/rust-pipeline.yml@main
+
+  go-pipeline:
+    needs: environment-discovery
+    if: needs.environment-discovery.outputs.is_go == 'true'
+    uses: ai-governance-poc-2026/devops-governance/.github/workflows/go-pipeline.yml@main
+
+  ai-agent-pipeline:
+    needs: environment-discovery
+    if: needs.environment-discovery.outputs.is_ai_agent == 'true'
+    uses: ai-governance-poc-2026/devops-governance/.github/workflows/ai-agent-pipeline.yml@main
+
+  security-and-compliance:
+    needs: [ environment-discovery ]
+    if: always() && !cancelled()
+    uses: ai-governance-poc-2026/devops-governance/.github/workflows/security-pipeline.yml@main

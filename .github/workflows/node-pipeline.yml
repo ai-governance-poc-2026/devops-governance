@@ -1,0 +1,18 @@
+name: Node Quality Sub-Context
+on:
+  workflow_call:
+jobs:
+  validate-node:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Initialize Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run ESLint Security Profile
+        run: |
+          npm install --save-dev eslint eslint-plugin-security
+          echo 'import security from "eslint-plugin-security"; export default [ security.configs.recommended ];' > eslint.config.js
+          npx eslint . --max-warnings 0

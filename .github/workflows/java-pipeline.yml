@@ -1,0 +1,17 @@
+name: Java Quality Sub-Context
+on:
+  workflow_call:
+jobs:
+  validate-java:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Initialize Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Route Java Test Execution
+        run: |
+          if [ -f ./gradlew ]; then ./gradlew test; elif [ -f ./mvnw ]; then ./mvnw clean test; else echo "Skipping standalone build evaluation."; fi
