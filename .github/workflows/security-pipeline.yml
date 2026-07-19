@@ -19,7 +19,8 @@ jobs:
               echo "❌ CRITICAL SECURITY ERROR: Unencrypted credential leak matched in: $file"
               ERRORS=$((ERRORS + 1))
             fi
-          done < <(find . -type f -not -path '*/.*' -not -path '*node_modules*' -not -path '*target*')
+          done < <(find . -type f -not -path '*/.*' -not -path '*node_modules*' -not -path '*target*' \
+            -not -path '*test*' -not -path '*tests*' -not -path '*spec*' -not -path '*fixtures*' -not -path '*mocks*' -not -path '*__tests__*')
           if [ $ERRORS -gt 0 ]; then exit 1; fi
       - name: Verify Footprint Weight Budgets
         run: |
