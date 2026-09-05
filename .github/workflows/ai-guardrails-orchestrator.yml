@@ -16,7 +16,7 @@ jobs:
       is_ai_agent: ${{ steps.check.outputs.is_ai_agent }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Inspect Repository Signature
         id: check
@@ -34,34 +34,34 @@ jobs:
   node-pipeline:
     needs: environment-discovery
     if: needs.environment-discovery.outputs.is_node == 'true'
-    uses: ai-governance-poc-2026/devops-governance/.github/workflows/node-pipeline.yml@main
+    uses: ./.github/workflows/node-pipeline.yml
 
   python-pipeline:
     needs: environment-discovery
     if: needs.environment-discovery.outputs.is_python == 'true'
-    uses: ai-governance-poc-2026/devops-governance/.github/workflows/python-pipeline.yml@main
+    uses: ./.github/workflows/python-pipeline.yml
 
   java-pipeline:
     needs: environment-discovery
     if: needs.environment-discovery.outputs.is_java == 'true'
-    uses: ai-governance-poc-2026/devops-governance/.github/workflows/java-pipeline.yml@main
+    uses: ./.github/workflows/java-pipeline.yml
 
   rust-pipeline:
     needs: environment-discovery
     if: needs.environment-discovery.outputs.is_rust == 'true'
-    uses: ai-governance-poc-2026/devops-governance/.github/workflows/rust-pipeline.yml@main
+    uses: ./.github/workflows/rust-pipeline.yml
 
   go-pipeline:
     needs: environment-discovery
     if: needs.environment-discovery.outputs.is_go == 'true'
-    uses: ai-governance-poc-2026/devops-governance/.github/workflows/go-pipeline.yml@main
+    uses: ./.github/workflows/go-pipeline.yml
 
   ai-agent-pipeline:
     needs: environment-discovery
     if: needs.environment-discovery.outputs.is_ai_agent == 'true'
-    uses: ai-governance-poc-2026/devops-governance/.github/workflows/ai-agent-pipeline.yml@main
+    uses: ./.github/workflows/ai-agent-pipeline.yml
 
   security-and-compliance:
     needs: [ environment-discovery ]
     if: always() && !cancelled()
-    uses: ai-governance-poc-2026/devops-governance/.github/workflows/security-pipeline.yml@main
+    uses: ./.github/workflows/security-pipeline.yml
