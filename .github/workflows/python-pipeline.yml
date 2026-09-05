@@ -12,6 +12,11 @@ jobs:
         with:
           python-version: '3.12'
       - name: Execute Quality Verification
+        # Justification: ruff (style/lint) findings are advisory, not a security or
+        # correctness gate — onboarding should not block on lint style issues (unused
+        # imports, ambiguous names, etc). Findings still surface in the job log/annotations
+        # for visibility; only Ignite's own Phase 3/4 checks remain hard-blocking.
+        # Approved: nunocpereira@gmail.com, 2026-09-05.
         continue-on-error: true
         run: |
           pip install ruff
